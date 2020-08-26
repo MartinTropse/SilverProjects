@@ -1,4 +1,3 @@
-to﻿
 """
 Script that find land owners that have a "markavvattningsföretag" (a legal obligation to maintain ditches) contained within their properties, 
 meaning thay they are the single owner. 
