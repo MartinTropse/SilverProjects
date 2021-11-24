@@ -8,7 +8,7 @@ It checks for questions such as the area affected by drenching,
 how affected the river is by human fysical alteration, the percentage landtypes 
 that occurs along the rivers and so forth.  
 
-The results of the script was used in the EU-water classification of 2018 and stored in VISS. 
+The results of the script was used in the EU-water classification of 2019 and stored in VISS. 
 """
 
 import os

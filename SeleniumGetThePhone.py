@@ -1,12 +1,12 @@
-﻿
 """
-Script that takes input from "fastighetsregistret" 
-(database for adress connected to properites).
+Script that find land owners that have a "markavvattningsföretag" (a legal obligation to maintain ditches) contained within their properties, 
+meaning thay they are the single owner. 
 
-It then scrapes contactinfo sites hitta.se and ratsit.se for telephone 
-numbers to the respective properties. This data is then added to the input
-data and stored as excel file, separating personal/company/tax adress info
-in respective sheets.  
+This GIS-analysis is then connected to "fastighetsregistret" (a database that connects addresses to properites).  
+
+The output that is extracted from fastighetsregistret is in turn used to scrape hitta.se and ratsit.se for telephone 
+numbers to the respective properties. This data is then added to the input data and stored as excel file, 
+separating personal/company/tax adress info in respective sheets.  
 """
 
 import time
