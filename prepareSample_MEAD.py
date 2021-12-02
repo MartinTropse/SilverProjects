@@ -13,7 +13,7 @@ from unidecode import unidecode
 
 #%reset -f
 
-os.chdir("P:/eDNA/MEAD/Metadata/Sveavind/Gretas Klackar/2021/Maj/Sample")
+os.chdir("P:/eDNA/MEAD/Metadata/WPD/Storgrundet/2020/Juni/Sample")
 pd.set_option("display.max_columns",30)
 corCol=["SampleID","ProjectID","Lat","Long","Djup","DjupNivå","Datum","Tid","FiltreradVol","Temperatur","Delprov","ProvTyp","DNA_ng/uL","Fish_ng/uL","Vert_ng/uL"]
 
@@ -89,6 +89,7 @@ MergeDf['SampleID']=MergeDf['SampleID'].str.replace("_","")
 #Checks if NM internal ID has been added
 idChk = 0
 nmID=re.compile("(?<![A-Z])([0-9]{1,2}_[0-9]{1,2})")
+#re.complile"(?<![A-Z])([0-9]{4}") #Alternative pattern, matching: 9330(GK1029)
 zP=re.compile("\(|\)")
 
 print("Checks if NM internal ID has been added to sample ID and attempts to remove it.")
@@ -192,7 +193,7 @@ print(smpTable.head())
 print(smpTable.tail())
 print(smpTable.info())
 
-print("Check sample data summary. If data is correct enter any key, else type 'exit'")
+print("\nCheck sample data summary. If data is correct enter any key, else type 'exit'")
 if input() != "exit":
     smpTable.to_csv(os.getcwd()+"\\"+prjID+"_Sample.csv", index = False)
     print(f"Sample data was merged and stored at:\n{os.getcwd()}\\{prjID}_Sample.csv")
