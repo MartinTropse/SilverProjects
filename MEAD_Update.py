@@ -11,6 +11,7 @@ import os
 import pandas as pd
 import re
 import time
+from unidecode import unidecode
 
 os.chdir("P:/eDNA/MEAD/IncludedProjects")
 rootDir=os.listdir()
@@ -25,8 +26,24 @@ project = []
 sample = []
 aVal = 0
 
-rootDir=rootDir[9:len(rootDir)]
+pCol = ['ProjectID','Vindpark','Havsområde','Kund','Sekretess','Beskrivning']
+prjDf = pd.DataFrame(columns=pCol)
 
+#Build project dataframe
+for aDir in rootDir:
+    print(f"Merging project data in: {aDir}")
+    aList = os.listdir(os.getcwd()+"\\"+aDir)
+    for x in aList:
+        if re.search(PP,x):
+           pFile=pd.read_csv(os.getcwd()+"\\"+aDir+"\\"+x,sep=";",nrows=1)
+           prjDf=pd.concat([prjDf,pFile], axis=0, join='inner')
+           print(prjDf.shape)
+
+#Save project data to MEAD!
+prjDf.to_csv("P:/eDNA/MEAD/Database/MEAD_Project.csv", encoding='utf-8', index=False)
+           
+
+###Checks if OTU and Sample table and have matching SampleIDs at each position###         
 for aDir in rootDir:
     aList = os.listdir(os.getcwd()+"\\"+aDir)
     for x in aList:
@@ -77,6 +94,8 @@ for aDir in rootDir:
                 otu = []
                 project = []
                 sample = []
+
+
         
 MarVer=re.compile("OTU_[0-9]{6}MarVer3_MEAD.csv$")
 MiFish=re.compile("(UpdateOTU_[0-9]{6}MiFish_MEAD.csv$|OTU_[0-9]{6}MiFish_MEAD.csv$)")
@@ -106,39 +125,10 @@ for aDir in rootDir:
             del(MarFile)
             del(FishFile)
 
-df=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/102633_Triton/OTU_102633MarVer3_MEAD.csv", sep=',',index_col=False, usecols=range(1,16))
-df1=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/102633_Triton/UpdateOTU_102633MiFish_MEAD.csv", sep=',', usecols=range(1,16))
-df2=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/101724_GG/OTU_101724MiFish_MEAD.csv", sep=',')
 
-df1=df1.iloc[:,0:14]
-df1.shape
-df.shape
-
-df.info()
-df1.info()
-
-df.iloc[:,1:len(df.columns)]
-
-out=pd.concat([df,df1], axis=0, join='inner')
-len(out.columns)
-
-#df.columns[0]=="ProjectID"
-
-
-storeFrame.shape
-
-ggFish=pd.read_csv(os.getcwd()+"/102368_GG/UpdateOTU_102368MiFish_MEAD.csv")
-
-ggFish.columns
-
-njord=pd.read_csv(os.getcwd()+"/101808_Njord/OTU_101808MarVer3_MEAD.csv")
-njord.columns == df2.columns
-
-
-aX = pd.concat([storeFrame,fsDf], axis=0, join='inner')
-
+#baseDf=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/101808_Njord/OTU_101808MiFish_MEAD.csv")
 #Construct the OTU-table for MEAD 
-storeFrame=pd.DataFrame(columns=df2.columns)
+storeFrame=pd.DataFrame(columns=['ProjectID','SampleID','Primer','Species','SweName','Filter','SeqCount','ProportionPRCT','PresencePRCT','Phylum','Class','Order','Family','Genus','URL','Sequence'])
 
 for aDir in rootDir:
     aList = os.listdir(os.getcwd()+"\\"+aDir)
@@ -170,19 +160,15 @@ for aDir in rootDir:
                print("Shape of OTU-frame is: ", storeFrame.shape)
                time.sleep(2)
 
-typeSample=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/102368_GG/102368_Sample.csv", sep=',')
+storeFrame.to_csv("P:/eDNA/MEAD/Database/MEAD_OTU.csv",encoding='utf-8', index=False)
 
 
-###Det är en missmatch pågrund av l och L i DNA columnen. 
+#spDf=pd.read_csv("P:/eDNA/MEAD/Script/specialCharDf.csv", encoding="UTF-8") #Special character in case you want to replace "micro"
+#smpDf.columns = [col.replace(spDf.columns[1],spDf.columns[2]) for col in smpDf.columns]
+#typeSample=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/102368_GG/102368_Sample.csv", sep=',')
 
-df=pd.read_csv("P:/eDNA/MEAD/IncludedProjects/101724_GG/101724_Sample.csv", sep=',')
+storeSample=pd.DataFrame(columns=['SampleID','ProjectID','Lat','Long','Djup','DjupNivå','Datum','Tid','FiltreradVol','Temperatur','Delprov','ProvTyp','DNA_ng/µL','Fish_ng/µL','Vert_ng/µL'])
 
-len(df.columns)
-typeSample.columns == df.columns
-
-storeSample=pd.DataFrame(columns=typeSample.columns)
-storeSample.columns  
-           
 #Construct the sampl-table for MEAD 
 for aDir in rootDir:
     aList = os.listdir(os.getcwd()+"\\"+aDir)
@@ -190,13 +176,24 @@ for aDir in rootDir:
     for file in aList:
         if re.search(PS, file):
             smpDf=pd.read_csv(os.getcwd()+"\\"+aDir+"\\"+file)
+            smpDf.columns=typeSample.columns# Be careful with this line, force all columns to have equal names which might be wrong
             storeSample=pd.concat([storeSample,smpDf], axis=0, join='inner')
             print("Shape of OTU-frame is ", storeSample.shape)
             time.sleep(2)
-            
-        
 
+#Exports sample list to dataframe!            
+storeSample.to_csv("P:/eDNA/MEAD/Database/MEAD_Sample.csv",encoding="UTF-8", index=False)
 
+#Print columns names and shape for manual overview of datastructure            
+for aDir in rootDir:
+    aList = os.listdir(os.getcwd()+"\\"+aDir)
+    print("\nJoining sample-table in: ", aDir)
+    for file in aList:
+        if re.search(PS, file):
+            smpDf=pd.read_csv(os.getcwd()+"\\"+aDir+"\\"+file)
+            print(smpDf.shape)
+            print(smpDf.columns)
+            time.sleep(10)
 
 
 
